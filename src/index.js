@@ -1,8 +1,8 @@
 import cors from "cors";
 import chalk from "chalk";
 import dotenv from "dotenv";
+import router from "./routes/index.js";
 import express, { json } from "express";
-import { connection } from "./data/db.js";
 
 const App = express();
 dotenv.config();
@@ -12,5 +12,7 @@ const MESSAGE = chalk.green(`Server is running on port ${PORT}`);
 
 App.use(json());
 App.use(cors());
+
+App.use(router);
 
 App.listen(PORT, () => console.log(MESSAGE));
