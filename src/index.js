@@ -2,8 +2,11 @@ import cors from "cors";
 import chalk from "chalk";
 import dotenv from "dotenv";
 import express, { json } from "express";
+import { connection } from "./data/db.js";
 
 const App = express();
+dotenv.config();
+
 const PORT = process.env.PORT || 4000;
 const MESSAGE = chalk.green(`Server is running on port ${PORT}`);
 
