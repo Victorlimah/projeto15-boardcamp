@@ -7,10 +7,11 @@ export async function getGames(req, res) {
         if(!name) name = "";
 
         const games = await connection.query(`
-        SELECT games.*, categories.name AS "categoryName"
-        FROM games JOIN categories ON games."categoryId" = categories.id        
+            SELECT games.*, categories.name AS "categoryName"
+            FROM games LEFT JOIN categories ON games."categoryId" = categories.id
+            WHERE games.name LIKE '%${name}%'  
+            `);
         
-        `);
         res.send(games.rows);
     } catch(err){
         res.status(500).send({ message: "Error getting games", error: err });
@@ -34,9 +35,10 @@ export async function createGame(req, res){
             return res.status(409).send({ message: "Game already exists" });
 
         await connection.query(
-            `INSERT INTO games(name, image, "stockTotal", "categoryId", "pricePerDay")
+          `INSERT INTO games(name, image, "stockTotal", "categoryId", "pricePerDay")
             VALUES($1, $2, $3, $4, $5) RETURNING *`,
-            [name, image, stockTotal, categoryId, pricePerDay]);
+          [name, image, stockTotal, categoryId, pricePerDay]
+        );
 
         res.status(201).send({message: "Game created"});
     } catch(err){
