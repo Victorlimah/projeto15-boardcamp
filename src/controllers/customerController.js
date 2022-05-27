@@ -16,6 +16,23 @@ export async function getCustomers(req, res) {
   }
 }
 
+export async function getCustomer(req, res) {
+  try {
+    const { id } = req.params;
+    const cliente = await connection.query(
+      `SELECT * FROM customers WHERE id = $1`,
+      [id]
+    );
+
+    if (cliente.rows.length === 0) 
+      return res.status(404).send({ message: "Customer not found" });
+
+    res.send(cliente.rows[0]);
+  } catch (err) {
+    res.status(500).send({ message: "Error getting cliente", error: err });
+  }
+}
+
 export async function createCustomer(req, res) {
   const { name, birthday, cpf, phone } = req.body;
   try {
