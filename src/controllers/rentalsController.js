@@ -47,15 +47,12 @@ export async function getRentals(req, res) {
 }
 
 export async function createRental(req, res){
-  const { customerId, gameId, daysRented } = req.body;
-
   try{
-    const validation = rentalsSchema.validate({ customerId, gameId, daysRented });
+    const { customerId, gameId, daysRented } = req.body;
+
+    const validation = rentalsSchema.validate(req.body);
     if(validation.error)
       return res.status(400).send({ message: "Invalid rental data", error: validation.error });
-
-    const rentDate = new Date().toISOString().slice(0, 10);
-    const returnDate = null, delayFee = null;
 
     const client = await connection.query(`SELECT * FROM customers WHERE id=${customerId}`);
     if(client.rowCount === 0)
@@ -64,21 +61,25 @@ export async function createRental(req, res){
     const game = await connection.query(`SELECT * FROM games WHERE id=$1`, [gameId]);
     if (game.rowCount === 0)
       return res.status(400).send({ message: "Game not found" });
-     
-    const gameRented = await connection.query(`SELECT * FROM rentals WHERE gameId=$1`, [gameId]);
+
+    const gameRented = await connection.query(`
+      SELECT id FROM rentals WHERE "gameId"=$1 AND "returnDate" IS null `,
+      [gameId]
+    );
+
     if (gameRented.rowCount === game.rows[0].stockTotal)
     return res.status(400).send({ message: "Game not available" });
-     
-    const originalPrice = game.rows[0].pricePerDay * daysRented; 
-    await connection.query(`
-      INSERT 
-        INTO rentals(customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee)
-          VALUES($1, $2, $3, $4, $5, $6, $7)`,
-      [customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee]
-    );
-   
-    res.status(201).send({ message: "Rental created successfully" });
+  
+    const rentDate = new Date().toISOString().slice(0, 10);
+    const originalPrice = game.rows[0].pricePerDay * daysRented;
 
+    await connection.query(`
+      INSERT INTO
+        rentals("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee")
+      VALUES($1, $2, $3, $4, $5, $6, $7)
+    `, [customerId, gameId, rentDate, daysRented, null, originalPrice, null]);
+
+    res.status(201).send({ message: "Rental created successfully" });
   } catch (err){
     res.status(500).send({ message: "Error creating rental", error: err });
   }
