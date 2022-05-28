@@ -3,12 +3,14 @@ import {
   getCustomers,
   getCustomer,
   createCustomer,
+  putCustomer,
 } from "../controllers/customerController.js";
 
-const custumersRouter = Router();
+const customersRouter = Router();
 
-custumersRouter.get("/customers", getCustomers);
-custumersRouter.get("/customers/:id", getCustomer);
-custumersRouter.post("/customers", createCustomer);
+customersRouter.get("/customers", getCustomers);
+customersRouter.get("/customers/:id", getCustomer);
+customersRouter.post("/customers", createCustomer);
+customersRouter.put("/customers/:id", putCustomer);
 
-export default custumersRouter;
+export default customersRouter;
