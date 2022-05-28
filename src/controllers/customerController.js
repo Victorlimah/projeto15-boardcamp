@@ -69,14 +69,10 @@ export async function putCustomer(req, res){
     if (cpfExists.rowCount > 0 && cpfExists.rows[0].id !== id)
       return res.status(409).send({message: "CPF already exists"});
 
-    console.log(`Aqui antes do put o birthday é ${birthday}`);
-
     await connection.query(
       `UPDATE customers SET name = $1, birthday = $2, cpf = $3, phone = $4 WHERE id = $5 RETURNING *`,
       [name, birthday, cpf, phone, id]
     );
-
-
 
     res.status(200).send({ message: "Customer updated" });
   } catch (err){

@@ -5,7 +5,6 @@ export async function getRentals(req, res) {
   const { customerId, gameId } = req.query;
 
   try {
-  
     const params = [];
     const conditions = [];
     let where = "";
@@ -51,7 +50,6 @@ export async function createRental(req, res){
   const { customerId, gameId, daysRented } = req.body;
 
   try{
-
     const validation = rentalsSchema.validate({ customerId, gameId, daysRented });
     if(validation.error)
       return res.status(400).send({ message: "Invalid rental data", error: validation.error });
@@ -83,6 +81,22 @@ export async function createRental(req, res){
 
   } catch (err){
     res.status(500).send({ message: "Error creating rental", error: err });
+  }
+}
+
+export async function deleteRental(req, res){
+  const { id } = req.params;
+
+  try{
+    const rental = await connection.query(`SELECT * FROM rentals WHERE id=$1`, [id]);
+    if(rental.rowCount === 0)
+      return res.status(400).send({ message: "Rental not found" });
+
+    await connection.query(`DELETE FROM rentals WHERE id=$1`, [id]);
+    res.status(200).send({ message: "Rental deleted successfully" });
+
+  } catch (err){
+    res.status(500).send({ message: "Error deleting rental", error: err });
   }
 }
 
