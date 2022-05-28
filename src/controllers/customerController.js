@@ -6,26 +6,26 @@ export async function getCustomers(req, res) {
     let cpf = req.query.cpf;
     if (!cpf) cpf = "";
 
-    let clientes = await connection.query(`SELECT * FROM customers WHERE cpf ILIKE $1`, [`${cpf}%`]);
-    clientes.rows[0].birthday = clientes.rows[0].birthday.toISOString().substring(0, 10);
-    res.send(clientes.rows);
+    let customers = await connection.query(`SELECT * FROM customers WHERE cpf ILIKE $1`, [`${cpf}%`]);
+    customers.rows[0].birthday = customers.rows[0].birthday.toISOString().slice(0, 10);
+    res.send(customers.rows);
   } catch (err) {
-    res.status(500).send({ message: "Error getting clientes", error: err });
+    res.status(500).send({ message: "Error getting customers", error: err });
   }
 }
 
 export async function getCustomer(req, res) {
   try {
     const { id } = req.params;
-    let cliente = await connection.query(`SELECT * FROM customers WHERE id = $1`,[id]);
-    cliente.rows[0].birthday = cliente.rows[0].birthday.toISOString().substring(0, 10);
-
-    if (cliente.rows.length === 0) 
-      return res.status(404).send({ message: "Customer not found" });
-
-    res.send(cliente.rows[0]);
+    let customer = await connection.query(`SELECT * FROM customers WHERE id = $1`,[id]);
+    
+    if (customer.rows.length === 0) 
+    return res.status(404).send({ message: "Customer not found" });
+    
+    customer.rows[0].birthday = customer.rows[0].birthday.toISOString().slice(0, 10);
+    res.send(customer.rows[0]);
   } catch (err) {
-    res.status(500).send({ message: "Error getting cliente", error: err });
+    res.status(500).send({ message: "Error getting customer", error: err });
   }
 }
 
