@@ -3,11 +3,10 @@ import { rentalsFactory } from "./utils.js";
 import { rentalsSchema } from "../schemas/rentalsSchemas.js";
 
 export async function getRentalsMiddleware(req, res, next){
-    const { customerId, gameId } = req.query;
+    const { customerId, gameId, status } = req.query;
     
     try {
         const { orderBy, orderDir, paginate } = res.locals;
-        console.log(orderBy, orderDir, paginate);
         const params = [];
         const conditions = [];
         let where = "";
@@ -21,7 +20,17 @@ export async function getRentalsMiddleware(req, res, next){
         params.push(gameId);
         conditions.push(`rentals."gameId"=$${params.length}`);
         }
-    
+
+        if(status){
+          if(params.length === 0){
+            if(status === "open") where = `WHERE rentals."returnDate" IS NULL`;
+            else if(status === "closed") where = `WHERE rentals."returnDate" IS NOT NULL`;    
+          } else {
+              if(status === "open") conditions.push(`rentals."returnDate" IS NULL`);
+              else if(status === "closed") conditions.push(`rentals."returnDate" IS NOT NULL`);   
+            }
+        }
+
         if (params.length > 0) {
         where += `WHERE ${conditions.join(" AND ")}`;
         }
@@ -43,7 +52,7 @@ export async function getRentalsMiddleware(req, res, next){
         `,
             rowMode: "array",
           },
-          params
+          [...params]
         );
     
         res.locals.rentals = rentals.rows.map(rentalsFactory);
