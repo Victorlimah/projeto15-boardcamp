@@ -47,3 +47,15 @@ export function rentalsFactory(row) {
     },
   };
 }
+
+export function paginate(req, res, next) {
+  let { offset, limit } = req.query;
+
+  if (!offset) offset = 0;
+
+  let query = `offset ${offset}`
+  if (limit) query += ` limit ${Number(limit)}`;
+
+  res.locals.paginate = query;
+  next();
+}

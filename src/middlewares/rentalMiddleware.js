@@ -6,8 +6,8 @@ export async function getRentalsMiddleware(req, res, next){
     const { customerId, gameId } = req.query;
     
     try {
-        const { orderBy, orderDir } = res.locals;
-        console.log(orderBy, orderDir);
+        const { orderBy, orderDir, paginate } = res.locals;
+        console.log(orderBy, orderDir, paginate);
         const params = [];
         const conditions = [];
         let where = "";
@@ -39,7 +39,7 @@ export async function getRentalsMiddleware(req, res, next){
             JOIN games ON games.id=rentals."gameId"
             JOIN categories ON categories.id=games."categoryId"
             ${where}
-            ORDER BY rentals."${orderBy}" ${orderDir}
+            ORDER BY rentals."${orderBy}" ${orderDir} ${paginate}
         `,
             rowMode: "array",
           },

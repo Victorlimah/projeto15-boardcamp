@@ -57,7 +57,7 @@ export async function putCustomerMiddleware(req, res, next) {
 
 export async function getCustomersMiddleware(req, res, next) {
   try {
-    const { orderBy, orderDir } = res.locals;
+    const { orderBy, orderDir, paginate } = res.locals;
     let cpf = req.query.cpf;
     if (!cpf) cpf = "";
 
@@ -66,7 +66,7 @@ export async function getCustomersMiddleware(req, res, next) {
     WHERE
       cpf ILIKE $1
     ORDER BY 
-      ${orderBy} ${orderDir}`, [`${cpf}%`]);
+      ${orderBy} ${orderDir} ${paginate}`, [`${cpf}%`]);
 
     res.locals.customers = customers.rows;
     next();

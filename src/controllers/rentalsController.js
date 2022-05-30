@@ -29,4 +29,3 @@ export async function deleteRental(_req, res){
     res.status(500).send({ message: "Error deleting rental", error: err });
   }
 }
-

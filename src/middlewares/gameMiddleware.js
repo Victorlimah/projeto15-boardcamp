@@ -32,7 +32,7 @@ export async function createGameMiddleware(req, res, next) {
 }
 
 export async function getGameMiddleware(req, res, next) {
-  const { orderBy, orderDir } = res.locals;
+  const { orderBy, orderDir, paginate } = res.locals;
   try {
     let name = req.query.name;
     if (!name) name = "";
@@ -44,7 +44,7 @@ export async function getGameMiddleware(req, res, next) {
         JOIN categories ON games."categoryId" = categories.id
       WHERE
         games.name ILIKE $1
-      ORDER BY ${orderBy} ${orderDir}
+      ORDER BY ${orderBy} ${orderDir} ${paginate}
     `, [`%${name}%`]);
 
    res.locals.games = games.rows;

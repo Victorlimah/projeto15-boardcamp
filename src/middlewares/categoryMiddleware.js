@@ -3,14 +3,14 @@ import { categorySchema } from "./../schemas/categorySchemas.js";
 
 export async function getCategoriesMiddleware(req, res, next) {
   try {
-    const { orderBy, orderDir } = res.locals;
+    const { orderBy,orderDir, paginate } = res.locals;
 
-    const categories = await connection.query(
-      "SELECT * FROM categories ORDER BY " + orderBy + " " + orderDir
-    );
+    let query = `SELECT * FROM categories ORDER BY ${orderBy} ${orderDir} ${paginate}`;
+
+    const categories = await connection.query(query);
     res.locals.categories = categories.rows;
     next();
-  } catch (error) {
+  } catch (err) {
     res.status(500).send({ message: "Error getting categories", error: err });
   }
 }
