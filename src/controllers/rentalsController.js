@@ -1,5 +1,3 @@
-import { connection } from "../data/db.js";
-
 export async function getRentals(_req, res) {
   try {
     res.send(res.locals.rentals);

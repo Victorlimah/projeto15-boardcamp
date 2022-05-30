@@ -1,10 +1,13 @@
 import { connection } from "../data/db.js";
+import { rentalsFactory } from "./utils.js";
 import { rentalsSchema } from "../schemas/rentalsSchemas.js";
 
 export async function getRentalsMiddleware(req, res, next){
     const { customerId, gameId } = req.query;
     
     try {
+        const { orderBy, orderDir } = res.locals;
+        console.log(orderBy, orderDir);
         const params = [];
         const conditions = [];
         let where = "";
@@ -23,7 +26,8 @@ export async function getRentalsMiddleware(req, res, next){
         where += `WHERE ${conditions.join(" AND ")}`;
         }
     
-        const rentals = await connection.query({
+        const rentals = await connection.query(
+          {
             text: `
             SELECT 
             rentals.*,
@@ -35,9 +39,11 @@ export async function getRentalsMiddleware(req, res, next){
             JOIN games ON games.id=rentals."gameId"
             JOIN categories ON categories.id=games."categoryId"
             ${where}
+            ORDER BY rentals."${orderBy}" ${orderDir}
         `,
             rowMode: "array",
-        }, params
+          },
+          params
         );
     
         res.locals.rentals = rentals.rows.map(rentalsFactory);
@@ -126,42 +132,4 @@ export async function deleteRentalMiddleware(req, res, next){
   } catch (err){
     res.status(500).send({ message: "Error deleting rental", error: err });
   }
-}
-
-function rentalsFactory(row) {
-  const [
-    id,
-    customerId,
-    gameId,
-    rentDate,
-    daysRented,
-    returnDate,
-    originalPrice,
-    delayFee,
-    customerName,
-    gameName,
-    categoryId,
-    categoryName,
-  ] = row;
-
-  return {
-    id,
-    customerId,
-    gameId,
-    rentDate,
-    daysRented,
-    returnDate,
-    originalPrice,
-    delayFee,
-    customer: {
-      id: customerId,
-      name: customerName,
-    },
-    game: {
-      id: gameId,
-      name: gameName,
-      categoryId,
-      categoryName,
-    },
-  };
 }
