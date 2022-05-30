@@ -1,16 +1,12 @@
 import { Router } from "express";
-import {
-  getCustomers,
-  getCustomer,
-  createCustomer,
-  putCustomer,
-} from "../controllers/customerController.js";
+import { createCustomerMiddleware, putCustomerMiddleware } from "../middlewares/customerMiddleware.js";
+import { getCustomers, getCustomer, createCustomer, putCustomer } from "../controllers/customerController.js";
 
 const customersRouter = Router();
 
 customersRouter.get("/customers", getCustomers);
 customersRouter.get("/customers/:id", getCustomer);
-customersRouter.post("/customers", createCustomer);
-customersRouter.put("/customers/:id", putCustomer);
+customersRouter.put("/customers/:id", putCustomerMiddleware, putCustomer);
+customersRouter.post("/customers", createCustomerMiddleware, createCustomer);
 
 export default customersRouter;

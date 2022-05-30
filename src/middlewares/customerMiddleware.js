@@ -40,3 +40,4 @@ export async function putCustomerMiddleware(req, res, next) {
     res.status(500).send({ message: "Error updating customer", error: err });
   }
 }
+
