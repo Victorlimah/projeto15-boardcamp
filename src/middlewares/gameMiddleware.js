@@ -37,17 +37,21 @@ export async function getGameMiddleware(req, res, next) {
     let name = req.query.name;
     if (!name) name = "";
 
-    const games = await connection.query(`
+    const games = await connection.query(
+      `
       SELECT
-        games.*, categories.name AS "categoryName"
+        games.*, categories.name AS "categoryName",
+         (SELECT COUNT(*) FROM rentals WHERE "gameId"=games.id) AS rentalsCount
       FROM games
         JOIN categories ON games."categoryId" = categories.id
       WHERE
         games.name ILIKE $1
-      ORDER BY ${orderBy} ${orderDir} ${paginate}
-    `, [`%${name}%`]);
+      ORDER BY ${orderBy} ${orderDir} ${paginate}  
+    `,
+      [`${name}%`]
+    );
 
-   res.locals.games = games.rows;
+    res.locals.games = games.rows;
     next();
   } catch (err) {
     res.status(500).send({ message: "Error getting games", error: err });

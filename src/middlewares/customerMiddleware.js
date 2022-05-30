@@ -62,11 +62,16 @@ export async function getCustomersMiddleware(req, res, next) {
     if (!cpf) cpf = "";
 
     const customers = await connection.query(`
-    SELECT * FROM customers
-    WHERE
-      cpf ILIKE $1
+      SELECT 
+        customers.*,
+        (SELECT COUNT(*) FROM rentals WHERE "customerId"=customers.id) AS rentalsCount
+      FROM customers
+      WHERE
+        customers.cpf ILIKE $1
     ORDER BY 
-      ${orderBy} ${orderDir} ${paginate}`, [`${cpf}%`]);
+      ${orderBy} ${orderDir} ${paginate}`,
+      [`${cpf}%`]
+    );
 
     res.locals.customers = customers.rows;
     next();
