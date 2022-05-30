@@ -134,7 +134,10 @@ export async function deleteRentalMiddleware(req, res, next){
     try{
       const rental = await connection.query(`SELECT * FROM rentals WHERE id=$1`, [id]);
       if(rental.rowCount === 0)
-        return res.status(400).send({ message: "Rental not found" });
+        return res.status(404).send({ message: "Rental not found" });
+
+      if(rental.rows[0].returnDate === null)
+        return res.status(400).send({ message: "Rental not returned" });
 
       await connection.query(`DELETE FROM rentals WHERE id=$1`, [id]);
       next();
