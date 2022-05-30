@@ -113,6 +113,21 @@ export async function finalizeRentalMiddleware(req, res, next){
     }
 }
 
+export async function deleteRentalMiddleware(req, res, next){
+    const { id } = req.params;
+
+    try{
+      const rental = await connection.query(`SELECT * FROM rentals WHERE id=$1`, [id]);
+      if(rental.rowCount === 0)
+        return res.status(400).send({ message: "Rental not found" });
+
+      await connection.query(`DELETE FROM rentals WHERE id=$1`, [id]);
+      next();
+  } catch (err){
+    res.status(500).send({ message: "Error deleting rental", error: err });
+  }
+}
+
 function rentalsFactory(row) {
   const [
     id,
