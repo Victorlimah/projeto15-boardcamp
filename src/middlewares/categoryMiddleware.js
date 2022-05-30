@@ -18,3 +18,18 @@ export async function createCategoryMiddleware(req, res, next) {
     res.status(500).send({ message: "Error creating category", error: err });
   }
 }
+
+export async function getCategoriesMiddleware(req, res, next) {
+  const { order, desc } = req.query;
+
+  try {
+    const orderBy = order || "id";
+    const orderDir = desc ? "DESC" : "ASC";
+
+    const categories = await connection.query("SELECT * FROM categories ORDER BY " + orderBy + " " + orderDir);
+    res.locals.categories = categories.rows;
+    next();
+  } catch (error) {
+    res.status(500).send({ message: "Error getting categories", error: err });
+  }
+}

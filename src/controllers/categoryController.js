@@ -2,8 +2,7 @@ import { connection } from "../data/db.js";
 
 export async function getCategories(_req, res) {
   try {
-    const categories = await connection.query("SELECT * FROM categories");
-    res.send(categories.rows);
+    res.send(res.locals.categories);
   } catch (err) {
     res.status(500).send({ message: "Error getting categories", error: err });
   }
