@@ -63,9 +63,7 @@ export async function createRental(req, res){
       return res.status(400).send({ message: "Game not found" });
 
     const gameRented = await connection.query(`
-      SELECT id FROM rentals WHERE "gameId"=$1 AND "returnDate" IS null `,
-      [gameId]
-    );
+      SELECT id FROM rentals WHERE "gameId"=$1 AND "returnDate" IS null `,[gameId]);
 
     if (gameRented.rowCount === game.rows[0].stockTotal)
     return res.status(400).send({ message: "Game not available" });
