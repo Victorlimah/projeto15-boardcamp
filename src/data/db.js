@@ -8,11 +8,9 @@ const dbCofig = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-
-if(process.env.MODE === "PROD"){
+if (process.env.MODE === "PROD") {
   dbCofig.ssl = {
     rejectUnauthorized: false,
   };
 }
-
 export const connection = dbCofig;

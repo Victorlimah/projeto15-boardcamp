@@ -68,7 +68,7 @@ export async function createRentalMiddleware(req, res, next){
 
     const validation = rentalsSchema.validate(req.body);
     if(validation.error)
-      return res.status(400).send({ message: "Invalid rental data", error: validation.error });
+      return res.status(422).send({ message: "Invalid rental data", error: validation.error });
 
     const client = await connection.query(`SELECT * FROM customers WHERE id=${customerId}`);
     if(client.rowCount === 0)
